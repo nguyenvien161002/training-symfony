@@ -1,21 +1,56 @@
-version: '3'
-
+version: '3.3'
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-15}-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+  nginx:
+    image: nginx:1.17.4-alpine
+    ports:
+      - 8081:80
+    depends_on:
+      - php
+      - db
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - .:/application
+      - ./docker/nginx:/etc/nginx/conf.d
+
+  php:
+    build: ./docker
+    volumes:
+      - .:/application
+      - ./docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_PORT=3306
+      - DB_HOST=db
+      - DB_USERNAME=root
+      - DB_PASS=secret
+      - DB_NAME=app_db
+
+  db:
+    image: mysql:5.7
+    container_name: db
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=training_symfony
+      - MYSQL_ROOT_PASSWORD=1
+      - MYSQL_PASSWORD=1
+
+  redis:
+    image: redis:5.0.6-alpine
+    ports:
+      - "6382:6379"
+
+  phpmyadmin:
+    image: phpmyadmin
+    ports:
+      - 8082:80
+
+  mailer:
+    image: schickling/mailcatcher
+    ports: [ "1025", "1080" ]
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
+  db_data:

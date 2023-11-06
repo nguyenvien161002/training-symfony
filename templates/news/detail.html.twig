@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Chi Tiết Tin Tức{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Chi Tiết Tin Tức</h1>
+    <h2>{{ news.title }}</h2>
+    <p>{{ news.description }}</p>
+    <p>Ngày tạo: {{ news.createdAt|date('Y-m-d H:i:s') }}</p>
+    <p>Ngày sửa: {{ news.updatedAt|date('Y-m-d H:i:s') }}</p>
+</div>
+{% endblock %}

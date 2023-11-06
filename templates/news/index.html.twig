@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Danh Sách Tin Tức{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Danh Sách Tin Tức</h1>
+    {% for key, message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% for key, message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+    
+    <a href="{{ path('news_new') }}" class="btn btn-primary">Tạo Mới</a>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tiêu đề</th>
+                <th scope="col">Nội dung</th>
+                <th scope="col">Tác vụ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for news in pagination %}
+                <tr>
+                    <th scope="row">{{ news.id }}</th>
+                    <td>{{ news.title }}</td>
+                    <td>{{ news.description }}</td>
+                    <td>
+                        <a href="{{ path('news_edit', {'id': news.id}) }}" class="btn btn-primary">Sửa</a>
+                        <a href="{{ path('news_delete', {'id': news.id}) }}" class="btn btn-danger">Xóa</a>
+                        <a href="{{ path('news_detail', {'id': news.id}) }}" class="btn btn-info">Xem</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="text-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {{ knp_pagination_render(pagination, '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig') }}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
